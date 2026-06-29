@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VETERANS FC - Full Stats</title>
+<style>
+:root{--blue:#2563eb;--blue-light:#3b82f6;--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--muted:#94a3b8;--green:#22c55e;--red:#ef4444;--orange:#f97316;--yellow:#fbbf24}
+body{background:var(--bg);color:var(--text);font-family:Arial;padding:15px;margin:0}
+.header{text-align:center;margin-bottom:20px}
+h2{color:var(--blue-light);font-size:22px}
+.card{background:var(--card);padding:18px;border-radius:16px;margin-bottom:14px;border:1px solid #334155}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tab{flex:1;background:#334155;color:var(--muted);border:none;padding:12px;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px}
+.tab.active{background:var(--blue);color:white}
+h3{color:var(--blue-light);margin-bottom:12px;font-size:16px}
+h4{color:var(--text);margin:14px 0 8px 0;font-size:14px}
+label{display:block;color:var(--muted);font-size:13px;margin-top:10px;margin-bottom:4px}
+input,select{width:100%;padding:11px;border-radius:8px;border:1px solid #475569;background:#0f172a;color:var(--text);font-size:14px}
+.btn{width:100%;padding:12px;border-radius:10px;border:0;font-weight:700;cursor:pointer;font-size:14px;margin-top:10px;display:block}
+.btn-primary{background:var(--blue);color:white}
+.btn-orange{background:var(--orange);color:white}
+.btn-whatsapp{background:#25D366;color:white}
+.btn-blue{background:var(--blue-light);color:white}
+.btn-small{padding:6px 10px;font-size:12px;width:auto;display:inline-block}
+.btn-danger{padding:6px 10px;font-size:12px;width:auto;background:var(--red);color:white;margin-left:4px;display:inline-block}
+.radio-group{display:flex;gap:8px;margin:8px 0}
+.radio-option{flex:1;padding:10px;border:2px solid #475569;border-radius:8px;text-align:center;cursor:pointer;font-size:13px}
+.radio-option.active{border-color:var(--blue);background:rgba(37,99,235,0.2);color:var(--blue-light)}
+.badge{font-size:11px;background:#334155;padding:4px 10px;border-radius:20px;margin-left:8px;font-weight:600}
+.badge.green{background:rgba(34,197,94,0.2);color:var(--green)}
+.badge.red{background:rgba(239,68,68,0.2);color:var(--red)}
+.badge.yellow{background:rgba(251,191,36,0.2);color:var(--yellow)}
+.match-info{background:#0f172a;padding:12px;border-radius:8px;margin:10px 0;border-left:3px solid var(--blue)}
+.player-row{padding:10px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.kit-badge{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;margin-right:4px}
+.kit-badges{display:flex}
+.jersey-blue{background:var(--blue);color:white}
+.jersey-white{background:white;color:#0f172a;border:1px solid #cbd5e1}
+.jersey-grey{background:#94a3b8;color:white}
+.socks-black{background:#000;color:white;border:1px solid #333}
+.socks-blue{background:var(--blue);color:white}
+.score-box{font-size:18px;font-weight:700;color:var(--blue-light);text-align:center;padding:12px;background:#0f172a;border-radius:8px;margin:10px 0}
+.goal-item{padding:8px;background:#0f172a;border-radius:8px;margin:6px 0;font-size:13px;border-left:3px solid var(--green);display:flex;justify-content:space-between;align-items:center}
+.match-card{padding:12px;background:#0f172a;border-radius:10px;margin:8px 0;border-left:4px solid var(--blue)}
+.match-card.win{border-left-color:var(--green)}
+.match-card.loss{border-left-color:var(--red)}
+.match-card.draw{border-left-color:var(--yellow)}
+.match-header{display:flex;justify-content:space-between;font-weight:700;margin-bottom:6px}
+.match-date{font-size:12px;color:var(--muted)}
+.admin-edit{margin-top:6px;padding-top:6px;border-top:1px dashed #334155;display:none}
+.admin-edit.show{display:block}
+.season-stats{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:8px;margin:12px 0}
+.stat-box{text-align:center;padding:12px;background:#0f172a;border-radius:8px;border:2px solid transparent}
+.stat-box.wins{background:rgba(34,197,94,0.15);border-color:var(--green)}
+.stat-box.losses{background:rgba(239,68,68,0.15);border-color:var(--red)}
+.stat-box.draws{background:rgba(251,191,36,0.15);border-color:var(--yellow)}
+.stat-num{font-size:22px;font-weight:700;color:var(--blue-light)}
+.admin-history{max-height:300px;overflow-y:auto}
+.multi-match{border:1px dashed #475569;padding:12px;border-radius:8px;margin:10px 0}
+</style>
+</head>
+<body>
+
+<div class="header"><h2>VETERANS FC</h2></div>
+
+<div class="tabs">
+<button class="tab active" onclick="showTab('matches',this)">Matches</button>
+<button class="tab" onclick="showTab('stats',this)">Stats</button>
+<button class="tab" onclick="showTab('admin',this)">Admin</button>
+</div>
+
+<div id="matches" class="card">
+<h3>Upcoming Fixtures</h3>
+<div id="todayMatches">No matches scheduled</div>
+
+<h4>Score Sheet <span class="badge" id="goalCount">0 Goals</span></h4>
+<div id="goalsList">No goals added yet</div>
+
+<label>Name</label><input id="playerName">
+<label>Phone</label><input id="playerPhone" type="tel">
+<label>Position</label>
+<select id="playerPos"><option>GK</option><option>DEF</option><option>MID</option><option>FWD</option></select>
+<label>Jersey</label>
+<select id="jerseyColor"><option value="blue">Blue</option><option value="white">White</option><option value="grey">Grey</option></select>
+<label>Socks</label>
+<select id="socksColor"><option value="black">Black</option><option value="blue">Blue</option></select>
+<label>Number</label><input id="jerseyNumber" type="number">
+
+<label>Availability</label>
+<div class="radio-group">
+<div class="radio-option active" onclick="setAvail('in',this)">✅ Available</div>
+<div class="radio-option" onclick="setAvail('out',this)">❌ Not Available</div>
+</div>
+<input type="hidden" id="availStatus" value="in">
+
+<button class="btn btn-primary" onclick="confirmRSVP()">Confirm RSVP</button>
+<h4>Available <span id="countIn" class="badge green">0 In</span></h4><div id="squadIn">No confirmations</div>
+<h4>Not Available <span id="countOut" class="badge red">0 Out</span></h4><div id="squadOut">All available</div>
+<button class="btn btn-blue" onclick="copySquad()">📋 Copy Squad</button>
+<button class="btn btn-whatsapp" onclick="openWA('vijana')">💬 Vijana</button>
+<button class="btn btn-whatsapp" onclick="openWA('wazee')">💬 Wazee</button>
+</div>
+
+<div id="stats" class="card" style="display:none">
+<h3>Season Stats</h3>
+<div class="season-stats">
+<div class="stat-box"><div class="stat-num" id="played">0</div><div>Played</div></div>
+<div class="stat-box wins"><div class="stat-num" id="wins">0</div><div>Wins</div></div>
+<div class="stat-box losses"><div class="stat-num" id="losses">0</div><div>Losses</div></div>
+<div class="stat-box draws"><div class="stat-num" id="draws">0</div><div>Draws</div></div>
+<div class="stat-box"><div class="stat-num" id="goalsFor">0</div><div>Goals</div></div>
+</div>
+<h4>Match History</h4><div id="matchHistory">No matches</div>
+<h4>Top Scorers <span class="badge yellow">⚽</span></h4><div id="topScorers">No goals</div>
+<h4>Top Assists <span class="badge yellow">🎯</span></h4><div id="topAssists">No assists</div>
+<h4>Top Assister <span class="badge yellow">👑</span></h4><div id="topAssister">No assists yet</div>
+</div>
+
+<div id="admin" class="card" style="display:none">
+<div id="loginBox">
+<h3>Admin Login</h3>
+<input id="adminPass" type="password" placeholder="Enter password">
+<button class="btn btn-primary" onclick="loginAdmin()">Login</button>
+</div>
+
+<div id="adminPanel" style="display:none">
+<h3>Admin Panel</h3>
+
+<h4>Add New Match</h4>
+<div class="multi-match">
+<input id="adminOpponent" placeholder="Opponent">
+<input id="adminDate" type="date">
+<input id="adminTime" type="time">
+<input id="adminLocation" placeholder="Location">
+<button class="btn btn-primary" onclick="addMatch()">+ Add Match</button>
+<button class="btn btn-danger" onclick="cancelMatch()">Cancel Last Match</button>
+</div>
+
+<h4>Default Kit Settings</h4>
+<label>Jersey Color</label>
+<select id="adminJersey"><option value="blue">Blue</option><option value="white">White</option><option value="grey">Grey</option></select>
+<label>Socks Color</label>
+<select id="adminSocks"><option value="black">Black</option><option value="blue">Blue</option></select>
+<button class="btn btn-orange" onclick="applyDefaultKit()">Apply to All Available Players</button>
+
+<h4>Add Goals - Admin Only</h4>
+<div id="adminGoalSection">
+<label>Select Match</label>
+<select id="adminMatchSelect" onchange="loadPlayersForMatch()"><option value="">Choose match first</option></select>
+<label>Scorer</label>
+<select id="adminGoalScorer"><option value="">Select Scorer</option></select>
+<label>Assist</label>
+<select id="adminGoalAssist"><option value="">No Assist</option></select>
+<button class="btn btn-small btn-primary" onclick="addGoalAdmin()">+ Add Goal</button>
+<div style="margin-top:8px;font-size:12px;color:var(--muted)">Click "+ Add Goal" multiple times to add more goals</div>
+</div>
+
+<h4>Save Match Results</h4>
+<label>Select Match to Update</label>
+<select id="resultMatchSelect"><option value="">Choose match</option></select>
+<input id="homeScore" type="number" placeholder="VETS Goals">
+<input id="awayScore" type="number" placeholder="Opponent Goals">
+<button class="btn btn-orange" onclick="saveResult()">Save Match Result</button>
+<button class="btn" style="background:#64748b" onclick="clearCurrentGoals()">Clear Current Goals Only</button>
+
+<h4>Recent Match History</h4>
+<div id="adminMatchHistory" class="admin-history">No matches</div>
+
+<h4>WhatsApp Links</h4>
+<input id="waLinkVijana" placeholder="Vijana link">
+<input id="waLinkWazee" placeholder="Wazee link">
+<button class="btn btn-primary" onclick="saveLinks()">Save Links</button>
+
+<button class="btn" style="background:var(--red)" onclick="resetSquad()">Reset All RSVPs</button>
+<button class="btn" style="background:#64748b" onclick="logoutAdmin()">Logout</button>
+</div>
+</div>
+
+<script>
+var squad=JSON.parse(localStorage.getItem('vetsSquad')||'[]');
+var waLinks=JSON.parse(localStorage.getItem('vetsLinks')||'{"vijana":"","wazee":""}');
+var matches=JSON.parse(localStorage.getItem('vetsMatches')||'[]');
+var goals=JSON.parse(localStorage.getItem('vetsGoals')||'[]');
+var matchHistory=JSON.parse(localStorage.getItem('vetsMatchHistory')||'[]');
+var defaultKit=JSON.parse(localStorage.getItem('vetsDefaultKit')||'{"jersey":"blue","socks":"black"}');
+var currentAvail='in';
+var isAdmin=false;
+var selectedMatchId=null;
+
+function showTab(id,btn){
+document.getElementById('matches').style.display='none';
+document.getElementById('stats').style.display='none';
+document.getElementById('admin').style.display='none';
+var tabs=document.querySelectorAll('.tab');
+for(var i=0;i<tabs.length;i++){tabs[i].classList.remove('active');}
+btn.classList.add('active');
+document.getElementById(id).style.display='block';
+if(id==='stats'){renderStats();}
+if(id==='matches'){renderMatchesTab();}
+if(id==='admin' && isAdmin){renderAdminPanel();}
+}
+
+function setAvail(status,el){
+currentAvail=status;
+document.getElementById('availStatus').value=status;
+var opts=document.querySelectorAll('.radio-option');
+for(var i=0;i<opts.length;i++){opts[i].classList.remove('active');}
+el.classList.add('active');
+}
+
+function confirmRSVP(){
+var name=document.getElementById('playerName').value.trim();
+if(!name){alert('Enter name');return;}
+var phone=document.getElementById('playerPhone').value.trim();
+var pos=document.getElementById('playerPos').value;
+var jersey=document.getElementById('jerseyColor').value;
+var socks=document.getElementById('socksColor').value;
+var number=document.getElementById('jerseyNumber').value||'-';
+squad=squad.filter(function(p){return p.name.toLowerCase()!==name.toLowerCase();});
+squad.push({name:name,phone:phone,pos:pos,jersey:jersey,socks:socks,number:number,avail:currentAvail,time:Date.now(),id:name.toLowerCase()});
+localStorage.setItem('vetsSquad',JSON.stringify(squad));
+renderMatchesTab();
+document.getElementById('playerName').value='';
+document.getElementById('playerPhone').value='';
+document.getElementById('jerseyNumber').value='';
+setAvail('in',document.querySelector('.radio-option'));
+alert(currentAvail==='in'?'Confirmed!':'Not available');
+}
+
+function renderMatchesTab(){
+var ins=squad.filter(function(p){return p.avail==='in';}).sort(function(a,b){return a.time-b.time;});
+var outs=squad.filter(function(p){return p.avail==='out';}).sort(function(a,b){return a.time-b.time;});
+document.getElementById('countIn').innerText=ins.length+' In';
+document.getElementById('countOut').innerText=outs.length+' Out';
+document.getElementById('squadIn').innerHTML=ins.length?ins.map(playerRow).join(''):'No confirmations';
+document.getElementById('squadOut').innerHTML=outs.length?outs.map(playerRow).join(''):'All available';
+
+if(matches.length===0){
+document.getElementById('todayMatches').innerHTML='No matches scheduled';
+}else{
+var html='';
+var sortedMatches=matches.slice().sort(function(a,b){return new Date(a.date+'T'+a.time)-new Date(b.date+'T'+b.time);});
+for(var i=0;i<sortedMatches.length;i++){
+var m=sortedMatches[i];
+var scoreText=m.home!==null?m.home+' - '+m.away:'-';
+html+='<div class="match-info"><div><b>vs '+m.opponent+'</b></div><div>Date: '+m.date+' | Time: '+m.time+'</div><div>Location: '+m.location+'</div><div class="score-box">Score: '+scoreText+'</div></div>';
+}
+document.getElementById('todayMatches').innerHTML=html;
+}
+
+var goalCount=goals.length;
+document.getElementById('goalCount').innerText=goalCount+' Goals';
+document.getElementById('goalsList').innerHTML=renderGoalsList(goals);
+}
+
+function renderGoalsList(goalArr){
+if(goalArr.length===0){return 'No goals added yet';}
+var counts={};
+for(var i=0;i<goalArr.length;i++){
+var g=goalArr[i];
+var key=g.scorer+'|'+(g.assist||'');
+if(!counts[key]){counts[key]={scorer:g.scorer,assist:g.assist,count:0};}
+counts[key].count++;
+}
+var html='';
+for(var key in counts){
+var c=counts[key];
+var delBtn=isAdmin?'<button class="btn-danger" onclick="removeGoalGroup(\''+c.scorer+'\',\''+(c.assist||'')+'\')">X</button>':'';
+html+='<div class="goal-item"><div>⚽ '+c.scorer+' <span class="badge yellow">'+c.count+' goal'+(c.count>1?'s':'')+'</span>'+(c.assist?' <span style="color:var(--yellow)">assist: '+c.assist+'</span>':'')+'</div>'+delBtn+'</div>';
+}
+return html;
+}
+
+function removeGoalGroup(scorer,assist){
+if(!confirm('Remove all goals by '+scorer+(assist?' assisted by '+assist:'' )+'?')){return;}
+goals=goals.filter(function(g){return!(g.scorer===scorer && (g.assist||'')===assist);});
+localStorage.setItem('vetsGoals',JSON.stringify(goals));
+renderMatchesTab();
+}
+
+function playerRow(p){
+var adminBtn=isAdmin?'<button class="btn-small btn-orange" onclick="toggleEdit(\''+p.id+'\')">Edit</button>':'';
+var adminEdit=isAdmin?'<div id="edit-'+p.id+'" class="admin-edit"><select id="edit-jersey-'+p.id+'"><option value="blue">Blue</option><option value="white">White</option><option value="grey">Grey</option></select><select id="edit-socks-'+p.id+'"><option value="black">Black</option><option value="blue">Blue</option></select><button class="btn-small btn-primary" onclick="updatePlayerKit(\''+p.id+'\')">Save</button></div>':'';
+return '<div class="player-row"><div class="kit-badges"><div class="kit-badge jersey-'+p.jersey+'">'+p.number+'</div><div class="kit-badge socks-'+p.socks+'"></div></div><div>'+p.name+' - '+p.pos+'</div><div>'+adminBtn+'</div></div>'+adminEdit;
+}
+
+function toggleEdit(id){
+document.getElementById('edit-'+id).classList.toggle('show');
+var p=squad.find(function(x){return x.id===id;});
+document.getElementById('edit-jersey-'+id).value=p.jersey;
+document.getElementById('edit-socks-'+id).value=p.socks;
+}
+
+function updatePlayerKit(id){
+var p=squad.find(function(x){return x.id===id;});
+p.jersey=document.getElementById('edit-jersey-'+id).value;
+p.socks=document.getElementById('edit-socks-'+id).value;
+localStorage.setItem('vetsSquad',JSON.stringify(squad));
+renderMatchesTab();
+alert('Kit updated');
+}
+
+function renderStats(){
+var scorers={};
+var assists={};
+var allGoals=[];
+for(var i=0;i<matchHistory.length;i++){
+var m=matchHistory[i];
+if(m.goals && m.goals.length>0){allGoals=allGoals.concat(m.goals);}
+}
+for(var i=0;i<allGoals.length;i++){
+var g=allGoals[i];
+scorers[g.scorer]=(scorers[g.scorer]||0)+1;
+if(g.assist){assists[g.assist]=(assists[g.assist]||0)+1;}
+}
+var wins=matchHistory.filter(function(m){return m.home>m.away;}).length;
+var losses=matchHistory.filter(function(m){return m.home<m.away;}).length;
+var draws=matchHistory.filter(function(m){return m.home===m.away;}).length;
+var played=matchHistory.length;
+var goalsFor=matchHistory.reduce(function(sum,m){return sum+(m.home||0);},0);
+document.getElementById('played').innerText=played;
+document.getElementById('wins').innerText=wins;
+document.getElementById('losses').innerText=losses;
+document.getElementById('draws').innerText=draws;
+document.getElementById('goalsFor').innerText=goalsFor;
+
+var historyHTML='';
+for(var i=matchHistory.length-1;i>=0;i--){
+var m=matchHistory[i];
+var result=m.home>m.away?'win':m.home<m.away?'loss':'draw';
+var goalsHTML=renderGoalsList(m.goals||[]);
+historyHTML+='<div class="match-card '+result+'"><div class="match-header"><span>'+m.opponent+'</span><span>'+m.home+' - '+m.away+'</span></div><div class="match-date">'+m.date+' | '+m.location+'</div><div style="margin-top:6px;font-size:12px">'+(goalsHTML||'No goals')+'</div></div>';
+}
+document.getElementById('matchHistory').innerHTML=historyHTML||'No matches';
+
+var scorerList='';
+var scorerArr=Object.entries(scorers).sort(function(a,b){return b[1]-a[1];}).slice(0,10);
+for(var i=0;i<scorerArr.length;i++){
+scorerList+='<div class="goal-item"><div>'+(i+1)+'. '+scorerArr[i][0]+'</div><span class="badge yellow">'+scorerArr[i][1]+' goal'+(scorerArr[i][1]>1?'s':'')+'</span></div>';
+}
+document.getElementById('topScorers').innerHTML=scorerList||'No goals';
+
+var assistList='';
+var assistArr=Object.entries(assists).sort(function(a,b){return b[1]-a[1];}).slice(0,10);
+for(var i=0;i<assistArr.length;i++){
+assistList+='<div class="goal-item"><div>'+(i+1)+'. '+assistArr[i][0]+'</div><span class="badge yellow">'+assistArr[i][1]+' assist'+(assistArr[i][1]>1?'s':'')+'</span></div>';
+}
+document.getElementById('topAssists').innerHTML=assistList||'No assists';
+
+var topAssisterName='';
+var topAssisterCount=0;
+for(var name in assists){
+if(assists[name]>topAssisterCount){
+topAssisterCount=assists[name];
+topAssisterName=name;
+}}
+document.getElementById('topAssister').innerHTML=topAssisterName?'<div class="goal-item"><div>👑 '+topAssisterName+'</div><span class="badge yellow">'+topAssisterCount+' assists</span></div>':'No assists yet';
+}
+
+function renderAdminPanel(){
+loadPlayersForMatch();
+var matchSelect=document.getElementById('adminMatchSelect');
+var resultSelect=document.getElementById('resultMatchSelect');
+matchSelect.innerHTML='<option value="">Choose match</option>';
+resultSelect.innerHTML='<option value="">Choose match</option>';
+for(var i=0;i<matches.length;i++){
+matchSelect.innerHTML+='<option value="'+matches[i].id+'">'+matches[i].opponent+' - '+matches[i].date+' '+matches[i].time+'</option>';
+resultSelect.innerHTML+='<option value="'+matches[i].id+'">'+matches[i].opponent+' - '+matches[i].date+' '+matches[i].time+'</option>';
+}
+renderAdminHistory();
+}
+
+function loadPlayersForMatch(){
+var ins=squad.filter(function(p){return p.avail==='in';});
+var adminScorer=document.getElementById('adminGoalScorer');
+var adminAssist=document.getElementById('adminGoalAssist');
+adminScorer.innerHTML='<option value="">Select Scorer</option>';
+adminAssist.innerHTML='<option value="">No Assist</option>';
+for(var i=0;i<ins.length;i++){
+adminScorer.innerHTML+='<option value="'+ins[i].name+'">'+ins[i].name+'</option>';
+adminAssist.innerHTML+='<option value="'+ins[i].name+'">'+ins[i].name+'</option>';
+}
+}
+
+function renderAdminHistory(){
+var historyHTML='';
+for(var i=matchHistory.length-1;i>=0;i--){
+var m=matchHistory[i];
+var result=m.home>m.away?'win':m.home<m.away?'loss':'draw';
+var goalsHTML=renderGoalsList(m.goals||[]);
+var delBtn='<button class="btn-danger" onclick="deleteMatch('+m.id+')">Delete</button>';
+historyHTML+='<div class="match-card '+result+'"><div class="match-header"><span>'+m.opponent+'</span><span>'+m.home+' - '+m.away+'</span></div><div class="match-date">'+m.date+' | '+m.location+'</div><div style="margin-top:6px;font-size:12px">'+(goalsHTML||'No goals')+'</div>'+delBtn+'</div>';
+}
+document.getElementById('adminMatchHistory').innerHTML=historyHTML||'No matches';
+}
+
+function addMatch(){
+var opponent=document.getElementById('adminOpponent').value.trim();
+var date=document.getElementById('adminDate').value;
+var time=document.getElementById('adminTime').value;
+var location=document.getElementById('adminLocation').value.trim();
+if(!opponent||!date||!time||!location){alert('Fill all match details');return;}
+var newMatch={id:Date.now(),opponent:opponent,date:date,time:time,location:location,home:null,away:null};
+matches.push(newMatch);
+localStorage.setItem('vetsMatches',JSON.stringify(matches));
+document.getElementById('adminOpponent').value='';
+document.getElementById('adminDate').value='';
+document.getElementById('adminTime').value='';
+document.getElementById('adminLocation').value='';
+renderAdminPanel();
+renderMatchesTab();
+alert('Match added');
+}
+
+function cancelMatch(){
+if(matches.length===0){alert('No matches to cancel');return;}
+if(confirm('Cancel last added match?')){
+matches.pop();
+localStorage.setItem('vetsMatches',JSON.stringify(matches));
+renderAdminPanel();
+renderMatchesTab();
+alert('Match cancelled');
+}
+}
+
+function addGoalAdmin(){
+var matchId=document.getElementById('adminMatchSelect').value;
+var scorer=document.getElementById('adminGoalScorer').value;
+var assist=document.getElementById('adminGoalAssist').value;
+if(!matchId){alert('Select match first');return;}
+if(!scorer){alert('Select scorer');return;}
+goals.push({matchId:parseInt(matchId),scorer:scorer,assist:assist||null,time:Date.now()});
+localStorage.setItem('vetsGoals',JSON.stringify(goals));
+document.getElementById('adminGoalScorer').value='';
+document.getElementById('adminGoalAssist').value='';
+renderMatchesTab();
+alert('Goal added! Add more if needed.');
+}
+
+function saveResult(){
+var matchId=document.getElementById('resultMatchSelect').value;
+var home=parseInt(document.getElementById('homeScore').value);
+var away=parseInt(document.getElementById('awayScore').value);
+if(!matchId){alert('Select match');return;}
+if(isNaN(home)||isNaN(away)){alert('Enter both scores');return;}
+var match=matches.find(function(m){return m.id==matchId;});
+if(!match){alert('Match not found');return;}
+match.home=home;
+match.away=away;
+localStorage.setItem('vetsMatches',JSON.stringify(matches));
+
+// Save goals to history BEFORE clearing
+var matchGoals=goals.filter(function(g){return g.matchId==matchId;});
+var matchRecord={id:match.id,opponent:match.opponent,date:match.date,time:match.time,location:match.location,home:home,away:away,goals:matchGoals.slice(0)};
+matchHistory.push(matchRecord);
+localStorage.setItem('vetsMatchHistory',JSON.stringify(matchHistory));
+
+// Now clear goals for this match
+goals=goals.filter(function(g){return g.matchId!=matchId;});
+localStorage.setItem('vetsGoals',JSON.stringify(goals));
+
+document.getElementById('homeScore').value='';
+document.getElementById('awayScore').value='';
+renderMatchesTab();
+renderStats();
+renderAdminPanel();
+alert('Match saved with '+matchGoals.length+' goals! Check Stats tab.');
+}
+
+function deleteMatch(id){
+if(confirm('Delete this match from history?')){
+matchHistory=matchHistory.filter(function(m){return m.id!==id;});
+localStorage.setItem('vetsMatchHistory',JSON.stringify(matchHistory));
+renderStats();
+renderAdminHistory();
+}
+}
+
+function clearCurrentGoals(){
+if(confirm('Clear all current goals?')){
+goals=[];
+localStorage.setItem('vetsGoals',JSON.stringify(goals));
+renderMatchesTab();
+alert('Cleared');
+}
+}
+
+function copySquad(){
+var ins=squad.filter(function(p){return p.avail==='in';});
+if(!ins.length){alert('No players');return;}
+var text='VETERANS FC SQUAD\nAVAILABLE ('+ins.length+'):\n';
+for(var i=0;i<ins.length;i++){
+text+=(i+1)+'. '+ins[i].name+' #'+ins[i].number+' - '+ins[i].pos+' ['+ins[i].jersey.toUpperCase()+' + '+ins[i].socks.toUpperCase()+' SOCKS]\n';
+}
+navigator.clipboard.writeText(text);
+alert('Copied!');
+}
+
+function openWA(type){
+if(waLinks[type]){window.open(waLinks[type],'_blank');}
+else{alert('No link set for '+type);}
+}
+
+function loginAdmin(){
+if(document.getElementById('adminPass').value==='veterans2026'){
+isAdmin=true;
+document.getElementById('loginBox').style.display='none';
+document.getElementById('adminPanel').style.display='block';
+document.getElementById('waLinkVijana').value=waLinks.vijana;
+document.getElementById('waLinkWazee').value=waLinks.wazee;
+document.getElementById('adminJersey').value=defaultKit.jersey;
+document.getElementById('adminSocks').value=defaultKit.socks;
+renderAdminPanel();
+}else{alert('Wrong password');}
+}
+
+function logoutAdmin(){
+isAdmin=false;
+document.getElementById('adminPanel').style.display='none';
+document.getElementById('loginBox').style.display='block';
+document.getElementById('adminPass').value='';
+renderMatchesTab();
+}
+
+function applyDefaultKit(){
+defaultKit.jersey=document.getElementById('adminJersey').value;
+defaultKit.socks=document.getElementById('adminSocks').value;
+localStorage.setItem('vetsDefaultKit',JSON.stringify(defaultKit));
+for(var i=0;i<squad.length;i++){
+if(squad[i].avail==='in'){
+squad[i].jersey=defaultKit.jersey;
+squad[i].socks=defaultKit.socks;
+}}
+localStorage.setItem('vetsSquad',JSON.stringify(squad));
+renderMatchesTab();
+alert('Kit applied to all available players');
+}
+
+function saveLinks(){
+waLinks.vijana=document.getElementById('waLinkVijana').value.trim();
+waLinks.wazee=document.getElementById('waLinkWazee').value.trim();
+localStorage.setItem('vetsLinks',JSON.stringify(waLinks));
+alert('Links saved');
+}
+
+function resetSquad(){
+if(confirm('Clear all RSVPs?')){
+squad=[];
+localStorage.setItem('vetsSquad',JSON.stringify(squad));
+renderMatchesTab();
+alert('Reset');
+}
+}
+
+document.getElementById('jerseyColor').value=defaultKit.jersey;
+document.getElementById('socksColor').value=defaultKit.socks;
+renderMatchesTab();
+</script>
+</body>
+</html>
