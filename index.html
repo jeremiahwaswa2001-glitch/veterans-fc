@@ -67,6 +67,7 @@ input,select{width:100%;padding:11px;border-radius:8px;border:1px solid #475569;
   <h2>VETERANS FC</h2></div>
 
 <div class="tabs">
+  <button onclick="showTab('home')">Home</button>
 <button class="tab active" onclick="showTab('matches',this)">Matches</button>
 <button class="tab" onclick="showTab('stats',this)">Stats</button>
 <button class="tab" onclick="showTab('admin',this)">Admin</button>
@@ -177,6 +178,8 @@ input,select{width:100%;padding:11px;border-radius:8px;border:1px solid #475569;
 <button class="btn" style="background:var(--red)" onclick="resetSquad()">Reset All RSVPs</button>
 <button class="btn" style="background:#64748b" onclick="logoutAdmin()">Logout</button>
 </div>
+
+  <div id="home" class="tab-content" style="display none">
 </div>
 
 <script>
