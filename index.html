@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VETERANS FC - Full Stats</title>
+<title>VETERANS FC - Full App</title>
 <style>
 :root{--blue:#2563eb;--blue-light:#3b82f6;--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--muted:#94a3b8;--green:#22c55e;--red:#ef4444;--orange:#f97316;--yellow:#fbbf24}
 body{background:var(--bg);color:var(--text);font-family:Arial;padding:15px;margin:0}
 .header{text-align:center;margin-bottom:20px}
+.header img{width:80px;height:80px;border-radius:50%;border:3px solid var(--blue);margin-bottom:10px}
 h2{color:var(--blue-light);font-size:22px}
 .card{background:var(--card);padding:18px;border-radius:16px;margin-bottom:14px;border:1px solid #334155}
 .tabs{display:flex;gap:8px;margin-bottom:16px}
@@ -16,7 +17,8 @@ h2{color:var(--blue-light);font-size:22px}
 h3{color:var(--blue-light);margin-bottom:12px;font-size:16px}
 h4{color:var(--text);margin:14px 0 8px 0;font-size:14px}
 label{display:block;color:var(--muted);font-size:13px;margin-top:10px;margin-bottom:4px}
-input,select{width:100%;padding:11px;border-radius:8px;border:1px solid #475569;background:#0f172a;color:var(--text);font-size:14px}
+input,select,textarea{width:100%;padding:11px;border-radius:8px;border:1px solid #475569;background:#0f172a;color:var(--text);font-size:14px;box-sizing:border-box}
+textarea{resize:vertical;min-height:60px}
 .btn{width:100%;padding:12px;border-radius:10px;border:0;font-weight:700;cursor:pointer;font-size:14px;margin-top:10px;display:block}
 .btn-primary{background:var(--blue);color:white}
 .btn-orange{background:var(--orange);color:white}
@@ -58,96 +60,119 @@ input,select{width:100%;padding:11px;border-radius:8px;border:1px solid #475569;
 .stat-num{font-size:22px;font-weight:700;color:var(--blue-light)}
 .admin-history{max-height:300px;overflow-y:auto}
 .multi-match{border:1px dashed #475569;padding:12px;border-radius:8px;margin:10px 0}
+.post-card{background:#0f172a;padding:14px;border-radius:10px;margin:10px 0;border-left:3px solid var(--blue)}
+.post-card img{width:100%;border-radius:8px;margin-top:8px}
+.post-date{font-size:11px;color:var(--muted);margin-top:6px}
+.vote-btn{padding:8px 12px;background:var(--blue);color:white;border:none;border-radius:8px;margin:4px 2px;cursor:pointer;font-size:13px}
+.vote-btn:hover{background:var(--blue-light)}
+.vote-results{margin-top:10px;font-size:13px}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <img src="logo.png" alt="Veterans FC Logo" style="width:150px; height:150px; object-fit:cover; border-radius:50%; display:block; margin:0 auto 10px;">
-  <h2>VETERANS FC</h2></div>
+<img src="https://i.imgur.com/placeholder.png" alt="Veterans FC">
+<h2>VETERANS FC</h2>
+</div>
 
 <div class="tabs">
-<button class="tab active" onclick="showTab('home', this)">Home</button>
-<button class="tab active" onclick="showTab('matches',this)">Matches</button>
+<button class="tab active" onclick="showTab('home',this)">Home</button>
+<button class="tab" onclick="showTab('matches',this)">Matches</button>
 <button class="tab" onclick="showTab('stats',this)">Stats</button>
 <button class="tab" onclick="showTab('admin',this)">Admin</button>
 </div>
 
-<div id="matches" class="card">
-<h3>Upcoming Fixtures</h3>
-<div id="todayMatches">No matches scheduled</div>
-
-<h4>Score Sheet <span class="badge" id="goalCount">0 Goals</span></h4>
-<div id="goalsList">No goals added yet</div>
-
-<label>Name</label><input id="playerName">
-<label>Phone</label><input id="playerPhone" type="tel">
-<label>Position</label>
-<select id="playerPos"><option>GK</option><option>DEF</option><option>MID</option><option>FWD</option></select>
-<label>Jersey</label>
-<select id="jerseyColor"><option value="blue">Blue</option><option value="white">White</option><option value="grey">Grey</option></select>
-<label>Socks</label>
-<select id="socksColor"><option value="black">Black</option><option value="blue">Blue</option></select>
-<label>Number</label><input id="jerseyNumber" type="number">
-
-<label>Availability</label>
-<div class="radio-group">
-<div class="radio-option active" onclick="setAvail('in',this)">✅ Available</div>
-<div class="radio-option" onclick="setAvail('out',this)">❌ Not Available</div>
+<!-- HOME TAB -->
+<div id="home" class="card">
+<h3>Club Updates 🔵⚪</h3>
+<div id="posts-container"><p>Loading posts...</p></div>
+<h3 style="margin-top:30px">Man of the Match</h3>
+<div id="motm-container">
+<p>Select players to vote:</p>
+<div id="motm-vote-buttons"></div>
+<div class="vote-results" id="motm-results">No votes yet</div>
 </div>
-<input type="hidden" id="availStatus" value="in">
-
-<button class="btn btn-primary" onclick="confirmRSVP()">Confirm RSVP</button>
-<h4>Available <span id="countIn" class="badge green">0 In</span></h4><div id="squadIn">No confirmations</div>
-<h4>Not Available <span id="countOut" class="badge red">0 Out</span></h4><div id="squadOut">All available</div>
-<button class="btn btn-blue" onclick="copySquad()">📋 Copy Squad</button>
-<button class="btn btn-whatsapp" onclick="openWA('vijana')">💬 Vijana</button>
-<button class="btn btn-whatsapp" onclick="openWA('wazee')">💬 Wazee</button>
 </div>
 
+<!-- MATCHES TAB -->
+<div id="matches" class="card" style="display:none">
+    <h3>Upcoming Fixtures</h3>
+    <div id="todayMatches">No matches scheduled</div>
+    <h4>Score Sheet <span class="badge" id="goalCount">0 Goals</span></h4>
+    <div id="goalsList">No goals added yet</div>
+    <label>Name</label><input id="playerName">
+    <label>Phone</label><input id="playerPhone" type="tel">
+    <label>Position</label>
+    <select id="playerPos"><option>GK</option><option>DEF</option><option>MID</option><option>FWD</option></select>
+    <label>Jersey</label>
+    <select id="jerseyColor"><option value="blue">Blue</option><option value="white">White</option><option value="grey">Grey</option></select>
+    <label>Socks</label>
+    <select id="socksColor"><option value="black">Black</option><option value="blue">Blue</option></select>
+    <label>Number</label><input id="jerseyNumber" type="number">
+    <label>Availability</label>
+    <div class="radio-group">
+    <div class="radio-option active" onclick="setAvail('in',this)">✅ Available</div>
+    <div class="radio-option" onclick="setAvail('out',this)">❌ Not Available</div>
+    </div>
+    <input type="hidden" id="availStatus" value="in">
+    <button class="btn btn-primary" onclick="confirmRSVP()">Confirm RSVP</button>
+    <h4>Available <span id="countIn" class="badge green">0 In</span></h4><div id="squadIn">No confirmations</div>
+    <h4>Not Available <span id="countOut" class="badge red">0 Out</span></h4><div id="squadOut">All available</div>
+    <button class="btn btn-blue" onclick="copySquad()">📋 Copy Squad</button>
+    <button class="btn btn-whatsapp" onclick="openWA('vijana')">💬 Vijana</button>
+    <button class="btn btn-whatsapp" onclick="openWA('wazee')">💬 Wazee</button>
+    </div>
+
+    <!-- STATS TAB -->
 <div id="stats" class="card" style="display:none">
-<h3>Season Stats</h3>
-<div class="season-stats">
-<div class="stat-box"><div class="stat-num" id="played">0</div><div>Played</div></div>
-<div class="stat-box wins"><div class="stat-num" id="wins">0</div><div>Wins</div></div>
-<div class="stat-box losses"><div class="stat-num" id="losses">0</div><div>Losses</div></div>
-<div class="stat-box draws"><div class="stat-num" id="draws">0</div><div>Draws</div></div>
-<div class="stat-box"><div class="stat-num" id="goalsFor">0</div><div>Goals</div></div>
-</div>
-<h4>Match History</h4><div id="matchHistory">No matches</div>
-<h4>Top Scorers <span class="badge yellow">⚽</span></h4><div id="topScorers">No goals</div>
-<h4>Top Assists <span class="badge yellow">🎯</span></h4><div id="topAssists">No assists</div>
-<h4>Top Assister <span class="badge yellow">👑</span></h4><div id="topAssister">No assists yet</div>
-</div>
+    <h3>Season Stats</h3>
+    <div class="season-stats">
+    <div class="stat-box"><div class="stat-num" id="played">0</div><div>Played</div></div>
+    <div class="stat-box wins"><div class="stat-num" id="wins">0</div><div>Wins</div></div>
+    <div class="stat-box losses"><div class="stat-num" id="losses">0</div><div>Losses</div></div>
+    <div class="stat-box draws"><div class="stat-num" id="draws">0</div><div>Draws</div></div>
+    <div class="stat-box"><div class="stat-num" id="goalsFor">0</div><div>Goals</div></div>
+    </div>
+    <h4>Match History</h4><div id="matchHistory">No matches</div>
+    <h4>Top Scorers <span class="badge yellow">⚽</span></h4><div id="topScorers">No goals</div>
+    <h4>Top Assists <span class="badge yellow">🎯</span></h4><div id="topAssists">No assists</div>
+    <h4>Top Assister <span class="badge yellow">👑</span></h4><div id="topAssister">No assists yet</div>
+    </div>
+    
+    <!-- ADMIN TAB -->
+    <div id="admin" class="card" style="display:none">
+    <div id="loginBox">
+    <h3>Admin Login</h3>
+    <input id="adminPass" type="password" placeholder="Enter password">
+    <button class="btn btn-primary" onclick="loginAdmin()">Login</button>
+    </div>
+    <div id="adminPanel" style="display:none">
+    <h3>Admin Panel</h3>
+    <h4>Post Club Update</h4>
+    <div class="multi-match">
+    <input id="postTitle" placeholder="Post title">
+    <textarea id="postDesc" placeholder="Description"></textarea>
+    <input id="postImg" placeholder="Imgur image URL">
+    <button class="btn btn-primary" onclick="postUpdate()">Post Update</button>
+    <button class="btn btn-danger" onclick="deleteAllPosts()">Delete All Posts</button>
+    </div>
+    <h4>Add New Match</h4>
+    <div class="multi-match">
+    <input id="adminOpponent" placeholder="Opponent">
+    <input id="adminDate" type="date">
+    <input id="adminTime" type="time">
+    <input id="adminLocation" placeholder="Location">
+    <button class="btn btn-primary" onclick="addMatch()">+ Add Match</button>
+    <button class="btn btn-danger" onclick="cancelMatch()">Cancel Last Match</button>
+    </div>
+    <h4>Default Kit Settings</h4>
+    <label>Jersey Color</label>
+    <select id="adminJersey"><option value="blue">Blue</option><option value="white">White</option><option value="grey">Grey</option></select>
+    <label>Socks Color</label>
+    <select id="adminSocks"><option value="black">Black</option><option value="blue">Blue</option></select>
+    <button class="btn btn-orange" onclick="applyDefaultKit()">Apply to All Available Players</button>
 
-<div id="admin" class="card" style="display:none">
-<div id="loginBox">
-<h3>Admin Login</h3>
-<input id="adminPass" type="password" placeholder="Enter password">
-<button class="btn btn-primary" onclick="loginAdmin()">Login</button>
-</div>
-
-<div id="adminPanel" style="display:none">
-<h3>Admin Panel</h3>
-
-<h4>Add New Match</h4>
-<div class="multi-match">
-<input id="adminOpponent" placeholder="Opponent">
-<input id="adminDate" type="date">
-<input id="adminTime" type="time">
-<input id="adminLocation" placeholder="Location">
-<button class="btn btn-primary" onclick="addMatch()">+ Add Match</button>
-<button class="btn btn-danger" onclick="cancelMatch()">Cancel Last Match</button>
-</div>
-
-<h4>Default Kit Settings</h4>
-<label>Jersey Color</label>
-<select id="adminJersey"><option value="blue">Blue</option><option value="white">White</option><option value="grey">Grey</option></select>
-<label>Socks Color</label>
-<select id="adminSocks"><option value="black">Black</option><option value="blue">Blue</option></select>
-<button class="btn btn-orange" onclick="applyDefaultKit()">Apply to All Available Players</button>
-
-<h4>Add Goals - Admin Only</h4>
+    <h4>Add Goals - Admin Only</h4>
 <div id="adminGoalSection">
 <label>Select Match</label>
 <select id="adminMatchSelect" onchange="loadPlayersForMatch()"><option value="">Choose match first</option></select>
@@ -158,7 +183,6 @@ input,select{width:100%;padding:11px;border-radius:8px;border:1px solid #475569;
 <button class="btn btn-small btn-primary" onclick="addGoalAdmin()">+ Add Goal</button>
 <div style="margin-top:8px;font-size:12px;color:var(--muted)">Click "+ Add Goal" multiple times to add more goals</div>
 </div>
-
 <h4>Save Match Results</h4>
 <label>Select Match to Update</label>
 <select id="resultMatchSelect"><option value="">Choose match</option></select>
@@ -166,131 +190,15 @@ input,select{width:100%;padding:11px;border-radius:8px;border:1px solid #475569;
 <input id="awayScore" type="number" placeholder="Opponent Goals">
 <button class="btn btn-orange" onclick="saveResult()">Save Match Result</button>
 <button class="btn" style="background:#64748b" onclick="clearCurrentGoals()">Clear Current Goals Only</button>
-
 <h4>Recent Match History</h4>
 <div id="adminMatchHistory" class="admin-history">No matches</div>
-
 <h4>WhatsApp Links</h4>
 <input id="waLinkVijana" placeholder="Vijana link">
 <input id="waLinkWazee" placeholder="Wazee link">
 <button class="btn btn-primary" onclick="saveLinks()">Save Links</button>
-
 <button class="btn" style="background:var(--red)" onclick="resetSquad()">Reset All RSVPs</button>
 <button class="btn" style="background:#64748b" onclick="logoutAdmin()">Logout</button>
 </div>
-
-  <div id="home" class="tab-content" style="display none">
-    <div class="section">
-  <h2>Club Updates 🔵⚪</h2>
-  <div class="admin-box">
-    <h4>Admin Post</h4>
-    <input type="password" id="adminPass" placeholder="Password: veterans2026">
-    <input type="text" id="postTitle" placeholder="Post title">
-    <textarea id="postDesc" placeholder="Description" rows="3"></textarea>
-    <input type="url" id="postImage" placeholder="Imgur image URL">
-    <button class="btn" onclick="addPost()">Post Update</button>
-    <button class="btn btn-red" onclick="clearPosts()">Delete All Posts</button>
-  </div>
-  <div id="postsList"></div>
-</div>
-
-<div class="section">
-  <h2>Man of the Match</h2>
-  <div id="voting">
-    <button class="vote-btn" onclick="vote('Player 1 #10')">Vote Player 1 #10</button>
-    <button class="vote-btn" onclick="vote('Player 2 #7')">Vote Player 2 #7</button>
-    <button class="vote-btn" onclick="vote('Player 3 #4')">Vote Player 3 #4</button>
-    <button class="vote-btn" onclick="vote('Player 4 #9')">Vote Player 4 #9</button>
-    <button class="vote-btn" onclick="vote('Coach Gustavo')">Vote Coach Gustavo</button>
-  </div>
-  <h4 style="text-align:center;margin-top:30px">Live Results</h4>
-  <div id="results">Loading results...</div>
-</div>
-
-<script>
-const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe4MoVn1AJiyPQsvzxEq4w3YVrw9Jgs7hdZ8fD-0s1THck-dQ/formResponse";
-const ENTRY_ID = "entry.1465633603";
-const SHEET_CSV = "YOUR_CSV_LINK_HERE";
-const players = ['Player 1 #10','Player 2 #7','Player 3 #4','Player 4 #9','Coach Gustavo'];
-const ADMIN_PASS = "veterans2026";
-
-function addPost(){
-  const pass=document.getElementById('adminPass').value;
-  if(pass!==ADMIN_PASS){alert('Wrong password');return;}
-  const title=document.getElementById('postTitle').value;
-  const desc=document.getElementById('postDesc').value;
-  const img=document.getElementById('postImage').value;
-  if(!title||!desc){alert('Add title + description');return;}
-  const posts=JSON.parse(localStorage.getItem('vfcPosts')||'[]');
-  posts.unshift({title,desc,img,date:new Date().toLocaleString()});
-  localStorage.setItem('vfcPosts',JSON.stringify(posts));
-  document.getElementById('postTitle').value='';
-  document.getElementById('postDesc').value='';
-  document.getElementById('postImage').value='';
-  loadPosts();
-}
-
-function loadPosts(){
-  const posts=JSON.parse(localStorage.getItem('vfcPosts')||'[]');
-  let html='';
-  posts.forEach(p=>{
-    html+='<div class="post"><strong>'+p.title+'</strong><div class="post-date">'+p.date+'</div><p>'+p.desc+'</p>';
-    if(p.img){html+='<img src="'+p.img+'" alt="post">';}
-    html+='</div>';
-  });
-  document.getElementById('postsList').innerHTML=html||'<p style="text-align:center;color:#777">No posts yet</p>';
-}
-
-function clearPosts(){
-  if(confirm('Delete all posts?')){
-    localStorage.removeItem('vfcPosts');
-    loadPosts();
-  }
-}
-
-function vote(player){
-  fetch(FORM_URL,{
-    method:"POST",
-    mode:"no-cors",
-    body:new URLSearchParams({[ENTRY_ID]:player})
-  });
-  document.querySelectorAll('.vote-btn').forEach(b=>b.disabled=true);
-  document.getElementById('voting').innerHTML='<p class="thankyou">Thanks for voting! 🔵⚪</p>';
-  setTimeout(loadResults,2000);
-}
-
-async function loadResults(){
-  if(SHEET_CSV==="YOUR_CSV_LINK_HERE"){
-    document.getElementById('results').innerHTML='Add your Google Sheet CSV link in code first';
-    return;
-  }
-  try{
-    const res=await fetch(SHEET_CSV);
-    const text=await res.text();
-    const rows=text.split('\n').slice(1);
-    const votes={};
-    players.forEach(p=>votes[p]=0);
-    rows.forEach(row=>{
-      const vote=row.split(',').pop().trim().replace(/"/g,'');
-      if(votes[vote]!==undefined) votes[vote]++; // FIXED
-    });
-    const total=Object.values(votes).reduce((a,b)=>a+b,0)||1;
-    let html='';
-    players.forEach(p=>{
-      const count=votes[p];
-      const pct=((count/total)*100).toFixed(1);
-      html+='<div class="player-name">'+p+': '+count+' votes</div><div class="bar-wrap"><div class="bar" style="width:'+pct+'%">'+pct+'%</div></div>';
-    });
-    document.getElementById('results').innerHTML=html;
-  }catch(e){
-    document.getElementById('results').innerHTML='Results updating... refresh in 1 min';
-  }
-}
-
-loadPosts();
-loadResults();
-setInterval(loadResults,30000);
-</script>
 </div>
 
 <script>
@@ -299,34 +207,27 @@ var waLinks=JSON.parse(localStorage.getItem('vetsLinks')||'{"vijana":"","wazee":
 var matches=JSON.parse(localStorage.getItem('vetsMatches')||'[]');
 var goals=JSON.parse(localStorage.getItem('vetsGoals')||'[]');
 var matchHistory=JSON.parse(localStorage.getItem('vetsMatchHistory')||'[]');
+var posts=JSON.parse(localStorage.getItem('vetsPosts')||'[]');
+var motmVotes=JSON.parse(localStorage.getItem('vetsMOTM')||'{}');
 var defaultKit=JSON.parse(localStorage.getItem('vetsDefaultKit')||'{"jersey":"blue","socks":"black"}');
 var currentAvail='in';
 var isAdmin=false;
 var selectedMatchId=null;
+
 function showTab(id,btn){
-  // Hide all 4 tabs
   document.getElementById('home').style.display='none';
   document.getElementById('matches').style.display='none';
   document.getElementById('stats').style.display='none';
   document.getElementById('admin').style.display='none';
-
-  // Remove active from all buttons
   var tabs=document.querySelectorAll('.tab');
   for(var i=0;i<tabs.length;i++){tabs[i].classList.remove('active');}
-
-  // Make clicked button active
   btn.classList.add('active');
-
-  // Show clicked tab
   document.getElementById(id).style.display='block';
-
-  // Run tab-specific code
   if(id==='stats'){renderStats();}
   if(id==='matches'){renderMatchesTab();}
   if(id==='admin' && isAdmin){renderAdminPanel();}
-  if(id==='home'){if(typeof loadPosts==='function')loadPosts(); if(typeof renderMOTM==='function')renderMOTM();}
+  if(id==='home'){loadPosts(); renderMOTM();}
 }
-  
 
 function setAvail(status,el){
 currentAvail=status;
@@ -362,7 +263,6 @@ document.getElementById('countIn').innerText=ins.length+' In';
 document.getElementById('countOut').innerText=outs.length+' Out';
 document.getElementById('squadIn').innerHTML=ins.length?ins.map(playerRow).join(''):'No confirmations';
 document.getElementById('squadOut').innerHTML=outs.length?outs.map(playerRow).join(''):'All available';
-
 if(matches.length===0){
 document.getElementById('todayMatches').innerHTML='No matches scheduled';
 }else{
@@ -375,7 +275,6 @@ html+='<div class="match-info"><div><b>vs '+m.opponent+'</b></div><div>Date: '+m
 }
 document.getElementById('todayMatches').innerHTML=html;
 }
-
 var goalCount=goals.length;
 document.getElementById('goalCount').innerText=goalCount+' Goals';
 document.getElementById('goalsList').innerHTML=renderGoalsList(goals);
@@ -451,7 +350,6 @@ document.getElementById('wins').innerText=wins;
 document.getElementById('losses').innerText=losses;
 document.getElementById('draws').innerText=draws;
 document.getElementById('goalsFor').innerText=goalsFor;
-
 var historyHTML='';
 for(var i=matchHistory.length-1;i>=0;i--){
 var m=matchHistory[i];
@@ -460,21 +358,18 @@ var goalsHTML=renderGoalsList(m.goals||[]);
 historyHTML+='<div class="match-card '+result+'"><div class="match-header"><span>'+m.opponent+'</span><span>'+m.home+' - '+m.away+'</span></div><div class="match-date">'+m.date+' | '+m.location+'</div><div style="margin-top:6px;font-size:12px">'+(goalsHTML||'No goals')+'</div></div>';
 }
 document.getElementById('matchHistory').innerHTML=historyHTML||'No matches';
-
 var scorerList='';
 var scorerArr=Object.entries(scorers).sort(function(a,b){return b[1]-a[1];}).slice(0,10);
 for(var i=0;i<scorerArr.length;i++){
 scorerList+='<div class="goal-item"><div>'+(i+1)+'. '+scorerArr[i][0]+'</div><span class="badge yellow">'+scorerArr[i][1]+' goal'+(scorerArr[i][1]>1?'s':'')+'</span></div>';
 }
 document.getElementById('topScorers').innerHTML=scorerList||'No goals';
-
 var assistList='';
 var assistArr=Object.entries(assists).sort(function(a,b){return b[1]-a[1];}).slice(0,10);
 for(var i=0;i<assistArr.length;i++){
 assistList+='<div class="goal-item"><div>'+(i+1)+'. '+assistArr[i][0]+'</div><span class="badge yellow">'+assistArr[i][1]+' assist'+(assistArr[i][1]>1?'s':'')+'</span></div>';
 }
 document.getElementById('topAssists').innerHTML=assistList||'No assists';
-
 var topAssisterName='';
 var topAssisterCount=0;
 for(var name in assists){
@@ -576,17 +471,12 @@ if(!match){alert('Match not found');return;}
 match.home=home;
 match.away=away;
 localStorage.setItem('vetsMatches',JSON.stringify(matches));
-
-// Save goals to history BEFORE clearing
 var matchGoals=goals.filter(function(g){return g.matchId==matchId;});
 var matchRecord={id:match.id,opponent:match.opponent,date:match.date,time:match.time,location:match.location,home:home,away:away,goals:matchGoals.slice(0)};
 matchHistory.push(matchRecord);
 localStorage.setItem('vetsMatchHistory',JSON.stringify(matchHistory));
-
-// Now clear goals for this match
 goals=goals.filter(function(g){return g.matchId!=matchId;});
 localStorage.setItem('vetsGoals',JSON.stringify(goals));
-
 document.getElementById('homeScore').value='';
 document.getElementById('awayScore').value='';
 renderMatchesTab();
@@ -680,13 +570,76 @@ alert('Reset');
 }
 }
 
+function postUpdate(){
+if(!isAdmin){alert('Login as admin first');return;}
+var title=document.getElementById('postTitle').value.trim();
+var desc=document.getElementById('postDesc').value.trim();
+var img=document.getElementById('postImg').value.trim();
+if(!title||!desc){alert('Enter title and description');return;}
+posts.unshift({id:Date.now(),title:title,desc:desc,img:img,date:new Date().toLocaleString()});
+localStorage.setItem('vetsPosts',JSON.stringify(posts));
+document.getElementById('postTitle').value='';
+document.getElementById('postDesc').value='';
+document.getElementById('postImg').value='';
+loadPosts();
+alert('Posted!');
+}
+
+function loadPosts(){
+var container=document.getElementById('posts-container');
+if(posts.length===0){
+container.innerHTML='<p style="color:var(--muted)">No posts yet</p>';
+return;
+}
+var html='';
+for(var i=0;i<posts.length;i++){
+var p=posts[i];html+='<div class="post-card"><h4>'+p.title+'</h4><p>'+p.desc+'</p>'+(p.img?'<img src="'+p.img+'" alt="post">':'')+'<div class="post-date">'+p.date+'</div></div>';
+}
+container.innerHTML=html;
+}
+
+function deleteAllPosts(){
+if(!isAdmin){alert('Login as admin first');return;}
+if(confirm('Delete all posts?')){
+posts=[];
+localStorage.setItem('vetsPosts',JSON.stringify(posts));
+loadPosts();
+alert('All posts deleted');
+}
+}
+
+function renderMOTM(){
+var ins=squad.filter(function(p){return p.avail==='in';});
+var btnContainer=document.getElementById('motm-vote-buttons');
+btnContainer.innerHTML='';
+for(var i=0;i<ins.length;i++){
+btnContainer.innerHTML+='<button class="vote-btn" onclick="voteMOTM(\''+ins[i].name+'\')">'+ins[i].name+'</button>';
+}
+var results={};
+for(var voter in motmVotes){
+results[motmVotes[voter]]=(results[motmVotes[voter]]||0)+1;
+}
+var resultHTML='';
+var sorted=Object.entries(results).sort(function(a,b){return b[1]-a[1];});
+for(var i=0;i<sorted.length;i++){
+resultHTML+=sorted[i][0]+': '+sorted[i][1]+' vote'+(sorted[i][1]>1?'s':'')+'<br>';
+}
+document.getElementById('motm-results').innerHTML=resultHTML||'No votes yet';
+}
+
+function voteMOTM(player){
+var voterName=prompt('Enter your name to vote:');
+if(!voterName||!voterName.trim()){return;}
+motmVotes[voterName.trim().toLowerCase()]=player;
+localStorage.setItem('vetsMOTM',JSON.stringify(motmVotes));
+renderMOTM();
+alert('Voted for '+player+'!');
+}
+
 document.getElementById('jerseyColor').value=defaultKit.jersey;
 document.getElementById('socksColor').value=defaultKit.socks;
-renderMatchesTab();
-
-  // Load Home tab on page open
 document.addEventListener('DOMContentLoaded', function(){
-  showTab('home', document.querySelector('.tab'));
+showTab('home', document.querySelector('.tab'));
 });
 </script>
 </body>
