@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veterans FC Home</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;padding:16px;background:#f5f7fa}
+.section{background:white;border-radius:12px;padding:16px;margin-bottom:20px;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
+h2{color:#0047AB;margin-top:0;text-align:center}
+.admin-box{border:2px dashed #0047AB;padding:12px;border-radius:8px;margin-bottom:16px}
+input,textarea{width:100%;padding:10px;margin:6px 0;border:1px solid #ddd;border-radius:6px;box-sizing:border-box}
+.btn{background:#0047AB;color:white;border:none;padding:12px;width:100%;border-radius:8px;font-weight:bold;font-size:16px;cursor:pointer}
+.btn:active{background:#003380}
+.btn-red{background:#c62828}
+.post{border-bottom:1px solid #eee;padding:12px 0}
+.post img{width:100%;border-radius:8px;margin-top:8px}
+.post-date{font-size:12px;color:#777}
+.vote-btn{display:block;width:100%;padding:14px;margin:8px 0;background:#0047AB;color:white;border:none;border-radius:8px;font-size:16px;font-weight:bold}
+.vote-btn:disabled{background:#999}
+.bar-wrap{background:#eee;border-radius:8px;margin:8px 0}
+.bar{background:#0047AB;color:white;padding:12px;border-radius:8px;text-align:right;font-weight:bold;transition:width 0.5s}
+.player-name{margin-top:15px;font-weight:bold;font-size:14px}
+.thankyou{color:#0047AB;font-weight:bold;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="section">
+  <h2>Club Updates 🔵⚪</h2>
+  <div class="admin-box">
+    <h4>Admin Post</h4>
+    <input type="password" id="adminPass" placeholder="Password: veterans2026">
+    <input type="text" id="postTitle" placeholder="Post title">
+    <textarea id="postDesc" placeholder="Description" rows="3"></textarea>
+    <input type="url" id="postImage" placeholder="Imgur image URL">
+    <button class="btn" onclick="addPost()">Post Update</button>
+    <button class="btn btn-red" onclick="clearPosts()">Delete All Posts</button>
+  </div>
+  <div id="postsList"></div>
+</div>
+
+<div class="section">
+  <h2>Man of the Match</h2>
+  <div id="voting">
+    <button class="vote-btn" onclick="vote('Player 1 #10')">Vote Player 1 #10</button>
+    <button class="vote-btn" onclick="vote('Player 2 #7')">Vote Player 2 #7</button>
+    <button class="vote-btn" onclick="vote('Player 3 #4')">Vote Player 3 #4</button>
+    <button class="vote-btn" onclick="vote('Player 4 #9')">Vote Player 4 #9</button>
+    <button class="vote-btn" onclick="vote('Coach Gustavo')">Vote Coach Gustavo</button>
+  </div>
+  <h4 style="text-align:center;margin-top:30px">Live Results</h4>
+  <div id="results">Loading results...</div>
+</div>
+
+<script>
+const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe4MoVn1AJiyPQsvzxEq4w3YVrw9Jgs7hdZ8fD-0s1THck-dQ/formResponse";
+const ENTRY_ID = "entry.1465633603";
+const SHEET_CSV = "YOUR_CSV_LINK_HERE";
+const players = ['Player 1 #10','Player 2 #7','Player 3 #4','Player 4 #9','Coach Gustavo'];
+const ADMIN_PASS = "veterans2026";
+
+function addPost(){
+  const pass=document.getElementById('adminPass').value;
+  if(pass!==ADMIN_PASS){alert('Wrong password');return;}
+  const title=document.getElementById('postTitle').value;
+  const desc=document.getElementById('postDesc').value;
+  const img=document.getElementById('postImage').value;
+  if(!title||!desc){alert('Add title + description');return;}
+  const posts=JSON.parse(localStorage.getItem('vfcPosts')||'[]');
+  posts.unshift({title,desc,img,date:new Date().toLocaleString()});
+  localStorage.setItem('vfcPosts',JSON.stringify(posts));
+  document.getElementById('postTitle').value='';
+  document.getElementById('postDesc').value='';
+  document.getElementById('postImage').value='';
+  loadPosts();
+}
+
+function loadPosts(){
+  const posts=JSON.parse(localStorage.getItem('vfcPosts')||'[]');
+  let html='';
+  posts.forEach(p=>{
+    html+='<div class="post"><strong>'+p.title+'</strong><div class="post-date">'+p.date+'</div><p>'+p.desc+'</p>';
+    if(p.img){html+='<img src="'+p.img+'" alt="post">';}
+    html+='</div>';
+  });
+  document.getElementById('postsList').innerHTML=html||'<p style="text-align:center;color:#777">No posts yet</p>';
+}
+
+function clearPosts(){
+  if(confirm('Delete all posts?')){
+    localStorage.removeItem('vfcPosts');
+    loadPosts();
+  }
+}
+
+function vote(player){
+  fetch(FORM_URL,{
+    method:"POST",
+    mode:"no-cors",
+    body:new URLSearchParams({[ENTRY_ID]:player})
+  });
+  document.querySelectorAll('.vote-btn').forEach(b=>b.disabled=true);
+  document.getElementById('voting').innerHTML='<p class="thankyou">Thanks for voting! 🔵⚪</p>';
+  setTimeout(loadResults,2000);
+}
+
+async function loadResults(){
+  if(SHEET_CSV==="YOUR_CSV_LINK_HERE"){
+    document.getElementById('results').innerHTML='Add your Google Sheet CSV link in code first';
+    return;
+  }
+  try{
+    const res=await fetch(SHEET_CSV);
+    const text=await res.text();
+    const rows=text.split('\n').slice(1);
+    const votes={};
+    players.forEach(p=>votes[p]=0);
+    rows.forEach(row=>{
+      const vote=row.split(',').pop().trim().replace(/"/g,'');
+      if(votes[vote]!==undefined) votes[vote]++; // FIXED
+    });
+    const total=Object.values(votes).reduce((a,b)=>a+b,0)||1;
+    let html='';
+    players.forEach(p=>{
+      const count=votes[p];
+      const pct=((count/total)*100).toFixed(1);
+      html+='<div class="player-name">'+p+': '+count+' votes</div><div class="bar-wrap"><div class="bar" style="width:'+pct+'%">'+pct+'%</div></div>';
+    });
+    document.getElementById('results').innerHTML=html;
+  }catch(e){
+    document.getElementById('results').innerHTML='Results updating... refresh in 1 min';
+  }
+}
+
+loadPosts();
+loadResults();
+setInterval(loadResults,30000);
+</script>
+</body>
+</html>
