@@ -67,7 +67,7 @@ input,select{width:100%;padding:11px;border-radius:8px;border:1px solid #475569;
   <h2>VETERANS FC</h2></div>
 
 <div class="tabs">
-  <button onclick="showTab('home')">Home</button>
+<button class="tab active" onclick="showTab('home', this)">Home</button>
 <button class="tab active" onclick="showTab('matches',this)">Matches</button>
 <button class="tab" onclick="showTab('stats',this)">Stats</button>
 <button class="tab" onclick="showTab('admin',this)">Admin</button>
@@ -303,19 +303,30 @@ var defaultKit=JSON.parse(localStorage.getItem('vetsDefaultKit')||'{"jersey":"bl
 var currentAvail='in';
 var isAdmin=false;
 var selectedMatchId=null;
-
 function showTab(id,btn){
-document.getElementById('matches').style.display='none';
-document.getElementById('stats').style.display='none';
-document.getElementById('admin').style.display='none';
-var tabs=document.querySelectorAll('.tab');
-for(var i=0;i<tabs.length;i++){tabs[i].classList.remove('active');}
-btn.classList.add('active');
-document.getElementById(id).style.display='block';
-if(id==='stats'){renderStats();}
-if(id==='matches'){renderMatchesTab();}
-if(id==='admin' && isAdmin){renderAdminPanel();}
+  // Hide all 4 tabs
+  document.getElementById('home').style.display='none';
+  document.getElementById('matches').style.display='none';
+  document.getElementById('stats').style.display='none';
+  document.getElementById('admin').style.display='none';
+
+  // Remove active from all buttons
+  var tabs=document.querySelectorAll('.tab');
+  for(var i=0;i<tabs.length;i++){tabs[i].classList.remove('active');}
+
+  // Make clicked button active
+  btn.classList.add('active');
+
+  // Show clicked tab
+  document.getElementById(id).style.display='block';
+
+  // Run tab-specific code
+  if(id==='stats'){renderStats();}
+  if(id==='matches'){renderMatchesTab();}
+  if(id==='admin' && isAdmin){renderAdminPanel();}
+  if(id==='home'){if(typeof loadPosts==='function')loadPosts(); if(typeof renderMOTM==='function')renderMOTM();}
 }
+  
 
 function setAvail(status,el){
 currentAvail=status;
@@ -672,6 +683,11 @@ alert('Reset');
 document.getElementById('jerseyColor').value=defaultKit.jersey;
 document.getElementById('socksColor').value=defaultKit.socks;
 renderMatchesTab();
+
+  // Load Home tab on page open
+document.addEventListener('DOMContentLoaded', function(){
+  showTab('home', document.querySelector('.tab'));
+});
 </script>
 </body>
 </html>
